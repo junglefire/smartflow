@@ -1,9 +1,6 @@
 # coding: utf-8
-import sys
-sys.path.append('..')
+from .np import *
 import os
-from common.np import *
-
 
 def preprocess(text):
     text = text.lower()
