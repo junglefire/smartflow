@@ -4,8 +4,8 @@ import logging as log
 import urllib.request
 import numpy as np
 import os.path
-import gzip
 import pickle
+import gzip
 import os
 
 # download `mnist` dataset

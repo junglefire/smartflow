@@ -1,12 +1,14 @@
 # coding: utf-8
+import logging as log
 from .np import *
 import os
 
+# 
+# 生成文本的共现矩阵
 def preprocess(text):
     text = text.lower()
     text = text.replace('.', ' .')
     words = text.split(' ')
-
     word_to_id = {}
     id_to_word = {}
     for word in words:
@@ -14,54 +16,36 @@ def preprocess(text):
             new_id = len(word_to_id)
             word_to_id[word] = new_id
             id_to_word[new_id] = word
-
     corpus = np.array([word_to_id[w] for w in words])
-
     return corpus, word_to_id, id_to_word
 
 
+#
+# 计算余弦相似度
 def cos_similarity(x, y, eps=1e-8):
-    '''コサイン類似度の算出
-
-    :param x: ベクトル
-    :param y: ベクトル
-    :param eps: ”0割り”防止のための微小値
-    :return:
-    '''
     nx = x / (np.sqrt(np.sum(x ** 2)) + eps)
     ny = y / (np.sqrt(np.sum(y ** 2)) + eps)
     return np.dot(nx, ny)
 
 
+#
+# 查询相似度为TopN的单词
 def most_similar(query, word_to_id, id_to_word, word_matrix, top=5):
-    '''類似単語の検索
-
-    :param query: クエリ（テキスト）
-    :param word_to_id: 単語から単語IDへのディクショナリ
-    :param id_to_word: 単語IDから単語へのディクショナリ
-    :param word_matrix: 単語ベクトルをまとめた行列。各行に対応する単語のベクトルが格納されていることを想定する
-    :param top: 上位何位まで表示するか
-    '''
     if query not in word_to_id:
-        print('%s is not found' % query)
+        log.info('%s is not found', query)
         return
-
-    print('\n[query] ' + query)
+    log.info('[query] %s', query)
     query_id = word_to_id[query]
     query_vec = word_matrix[query_id]
-
     vocab_size = len(id_to_word)
-
     similarity = np.zeros(vocab_size)
     for i in range(vocab_size):
         similarity[i] = cos_similarity(word_matrix[i], query_vec)
-
     count = 0
     for i in (-1 * similarity).argsort():
         if id_to_word[i] == query:
             continue
-        print(' %s: %s' % (id_to_word[i], similarity[i]))
-
+        log.info(' - %s: %s', (id_to_word[i], similarity[i]))
         count += 1
         if count >= top:
             return
@@ -118,28 +102,22 @@ def create_co_matrix(corpus, vocab_size, window_size=1):
     return co_matrix
 
 
-def ppmi(C, verbose=False, eps = 1e-8):
-    '''PPMI（正の相互情報量）の作成
-
-    :param C: 共起行列
-    :param verbose: 進行状況を出力するかどうか
-    :return:
-    '''
+#
+# 正的点互信息
+def ppmi(C, verbose=False, eps=1e-8):
     M = np.zeros_like(C, dtype=np.float32)
     N = np.sum(C)
     S = np.sum(C, axis=0)
     total = C.shape[0] * C.shape[1]
     cnt = 0
-
     for i in range(C.shape[0]):
         for j in range(C.shape[1]):
             pmi = np.log2(C[i, j] * N / (S[j]*S[i]) + eps)
             M[i, j] = max(0, pmi)
-
             if verbose:
                 cnt += 1
                 if cnt % (total//100 + 1) == 0:
-                    print('%.1f%% done' % (100*cnt/total))
+                    log.info('%.1f%% done', (100*cnt/total))
     return M
 
 
