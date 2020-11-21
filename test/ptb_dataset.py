@@ -22,3 +22,19 @@ print()
 print("word_to_id['car']:", word_to_id['car'])
 print("word_to_id['happy']:", word_to_id['happy']) 
 print("word_to_id['lexus']:", word_to_id['lexus'])
+
+window_size = 2 
+wordvec_size = 100
+vocab_size = len(word_to_id) 
+print('counting co-occurrence ...')
+C = create_co_matrix(corpus, vocab_size, window_size) 
+print('calculating PPMI ...')
+W = ppmi(C, verbose=True)
+print('calculating SVD ...')
+
+U, S, V = np.linalg.svd(W)
+word_vecs = U[:, :wordvec_size]
+querys = ['you', 'year', 'car', 'toyota']
+
+for query in querys:
+	most_similar(query, word_to_id, id_to_word, word_vecs, top=5)
