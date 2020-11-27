@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 import matplotlib.pyplot as plt
+import smartflow as sf
 import logging as log
 
-from smartflow.dataset import mnist
-from smartflow import simple_nn
-from smartflow.config import *
+# from smartflow.dataset import mnist
+# from smartflow import simple_nn
+# from smartflow.config import *
 
 log.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s', level=log.INFO)
 
-mnist = mnist.Mnist("dataset")
+mnist = sf.dataset.mnist.Mnist("dataset")
 (x_train, t_train), (x_test, t_test) = mnist.load_mnist(one_hot_label=True)
 
 network = simple_nn.TwoLayerNet(input_size=784, hidden_size=100, output_size=10)

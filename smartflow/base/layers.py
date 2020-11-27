@@ -1,7 +1,7 @@
 # coding: utf-8
 from .np import *  # import numpy as np
 from .config import GPU
-from .loss import *
+from .function import *
 
 # 
 # 加法层
@@ -142,12 +142,14 @@ class SoftmaxWithLoss:
 		return dx
 
 
+#
+# SigmoidWithLoss层
 class SigmoidWithLoss:
 	def __init__(self):
 		self.params, self.grads = [], []
 		self.loss = None
-		self.y = None  # sigmoidの出力
-		self.t = None  # 教師データ
+		self.y = None
+		self.t = None
 
 	def forward(self, x, t):
 		self.t = t
@@ -159,6 +161,32 @@ class SigmoidWithLoss:
 		batch_size = self.t.shape[0]
 		dx = (self.y - self.t) * dout / batch_size
 		return dx
+
+
+#
+# 词嵌入
+class Embedding:
+	def __init__(self, W):
+		self.params = [W]
+		self.grads = [np.zeros_like(W)]
+		self.idx = None
+
+	def forward(self, idx):
+		W, = self.params
+		self.idx = idx
+		out = W[idx]
+		return out
+
+	def backward(self, dout):
+		dW, = self.grads
+		dW[...] = 0
+		if GPU:
+			np.scatter_add(dW, self.idx, dout)
+		else:
+			# 参考原书Page 136~137
+			np.add.at(dW, self.idx, dout)
+		return None
+
 
 
 class Dropout:
@@ -179,25 +207,3 @@ class Dropout:
 
 	def backward(self, dout):
 		return dout * self.mask
-
-
-class Embedding:
-	def __init__(self, W):
-		self.params = [W]
-		self.grads = [np.zeros_like(W)]
-		self.idx = None
-
-	def forward(self, idx):
-		W, = self.params
-		self.idx = idx
-		out = W[idx]
-		return out
-
-	def backward(self, dout):
-		dW, = self.grads
-		dW[...] = 0
-		if GPU:
-			np.scatter_add(dW, self.idx, dout)
-		else:
-			np.add.at(dW, self.idx, dout)
-		return None

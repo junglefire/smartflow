@@ -1,21 +1,23 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 import matplotlib.pyplot as plt
+import smartflow as sf
 import logging as log
+import numpy as np
 import sys
 
-from smartflow.dataset import spiral
-from smartflow.optimizer import *
-from smartflow.trainer import *
-from smartflow.config import *
-from smartflow.layers import *
+# from smartflow.dataset import spiral
+# from smartflow.optimizer import *
+# from smartflow.trainer import *
+# from smartflow.config import *
+# from smartflow.layers import *
 
 log.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s', level=log.INFO)
 
 #
 # 显示数据集
 def __show_dataset():
-	x, t = spiral.load_data() 
+	x, t = sf.dataset.spiral.load_data() 
 	log.info('x.shape: %s', x.shape) # (300, 2) 
 	log.info('t.shape: %s', t.shape) # (300, 3)
 	# 绘图
@@ -34,7 +36,7 @@ def __custom_train():
 	hidden_size = 10
 	learning_rate = 1.0
 	# 加载数据
-	x, t = spiral.load_data()
+	x, t = sf.dataset.spiral.load_data()
 	model = TwoLayerNet(input_size=2, hidden_size=hidden_size, output_size=3)
 	optimizer = SGD(lr=learning_rate)
 	# 学習で使用する変数
@@ -78,10 +80,10 @@ def __exec_trainer():
 	hidden_size = 10
 	learning_rate = 1.0
 	# 生成数据集
-	x, t = spiral.load_data()
+	x, t = sf.dataset.spiral.load_data()
 	model = TwoLayerNet(input_size=2, hidden_size=hidden_size, output_size=3)
-	optimizer = SGD(lr=learning_rate)
-	trainer = Trainer(model, optimizer)
+	optimizer = sf.base.optimizer.SGD(lr=learning_rate)
+	trainer = sf.base.trainer.Trainer(model, optimizer)
 	trainer.fit(x, t, max_epoch, batch_size, eval_interval=10)
 	trainer.plot()
 
@@ -98,11 +100,11 @@ class TwoLayerNet:
 		b2 = np.zeros(O)
 		# 定义NN的层
 		self.layers = [
-			Affine(W1, b1),
-			Sigmoid(),
-			Affine(W2, b2)
+			sf.base.layers.Affine(W1, b1),
+			sf.base.layers.Sigmoid(),
+			sf.base.layers.Affine(W2, b2)
 		]
-		self.loss_layer = SoftmaxWithLoss()
+		self.loss_layer = sf.base.layers.SoftmaxWithLoss()
 		# 存储参数和梯度
 		self.params, self.grads = [], []
 		for layer in self.layers:

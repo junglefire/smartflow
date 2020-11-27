@@ -1,15 +1,18 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-from smartflow.dataset import ptb
-from smartflow.optimizer import *
-from smartflow.trainer import *
-from smartflow.config import *
-from smartflow.layers import *
-from smartflow.util import *
+#from smartflow.dataset import ptb
+#from smartflow.optimizer import *
+#from smartflow.trainer import *
+#from smartflow.config import *
+#from smartflow.layers import *
+#from smartflow.util import *
+
+import smartflow as sf
+import logging as log
 
 log.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s', level=log.INFO)
 
-ptb = ptb.PTB("./dataset/ptb")
+ptb = sf.dataset.ptb.PTB("./dataset/ptb")
 corpus, word_to_id, id_to_word = ptb.load_data('train')
 
 print('corpus size:', len(corpus)) 
@@ -27,9 +30,9 @@ window_size = 2
 wordvec_size = 100
 vocab_size = len(word_to_id) 
 print('counting co-occurrence ...')
-C = create_co_matrix(corpus, vocab_size, window_size) 
+C = sf.base.util.create_co_matrix(corpus, vocab_size, window_size) 
 print('calculating PPMI ...')
-W = ppmi(C, verbose=True)
+W = sf.base.util.ppmi(C, verbose=True)
 print('calculating SVD ...')
 
 U, S, V = np.linalg.svd(W)
@@ -37,4 +40,4 @@ word_vecs = U[:, :wordvec_size]
 querys = ['you', 'year', 'car', 'toyota']
 
 for query in querys:
-	most_similar(query, word_to_id, id_to_word, word_vecs, top=5)
+	sf.base.util.most_similar(query, word_to_id, id_to_word, word_vecs, top=5)
