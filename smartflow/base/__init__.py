@@ -7,5 +7,7 @@ __all__ = [
 	'function',
 	'layers',
 	'optimizer',
-	'trainer'
+	'trainer',
+	'config',
+	'neg_sampling_layer'
 ]
