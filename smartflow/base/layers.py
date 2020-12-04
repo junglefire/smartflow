@@ -16,11 +16,32 @@ class AddLayer:
 	def backward(self, dout):
 		dx = dout * 1
 		dy = dout * 1
+		print(type(dx))
+		return dx, dy
+
+#
+# 乘法层
+class MulLayer:
+	def __init__(self):
+		self.x = None
+		self.y = None
+
+	def forward(self, x, y):
+		self.x = x
+		self.y = y				
+		out = x * y
+
+		return out
+
+	def backward(self, dout):
+		dx = dout * self.y
+		dy = dout * self.x
+
 		return dx, dy
 
 
 #
-# 乘法层
+# 矩阵乘法层
 class MatMul:
 	def __init__(self, W):
 		self.params = [W]
@@ -61,35 +82,35 @@ class Relu:
 #
 # Sigmoid层
 class Sigmoid:
-    def __init__(self):
-        self.params, self.grads = [], []
-        self.out = None
+	def __init__(self):
+		self.params, self.grads = [], []
+		self.out = None
 
-    def forward(self, x):
-        out = 1 / (1 + np.exp(-x))
-        self.out = out
-        return out
+	def forward(self, x: np.ndarray)-> np.ndarray:
+		out = 1 / (1 + np.exp(-x))
+		self.out = out
+		return out
 
-    def backward(self, dout):
-        dx = dout * (1.0 - self.out) * self.out
-        return dx
+	def backward(self, dout: np.ndarray)-> np.ndarray:
+		dx = dout * (1.0 - self.out) * self.out
+		return dx
 
 
 #
 # 仿射变换层
 class Affine:
-	def __init__(self, W, b):
+	def __init__(self, W: np.ndarray, b: np.ndarray):
 		self.params = [W, b]
 		self.grads = [np.zeros_like(W), np.zeros_like(b)]
 		self.x = None
 
-	def forward(self, x):
+	def forward(self, x: np.ndarray)-> np.ndarray:
 		W, b = self.params
 		out = np.dot(x, W) + b
 		self.x = x
 		return out
 
-	def backward(self, dout):
+	def backward(self, dout: np.ndarray)-> np.ndarray:
 		W, b = self.params
 		dx = np.dot(dout, W.T)
 		dW = np.dot(self.x.T, dout)
@@ -106,11 +127,11 @@ class Softmax:
 		self.params, self.grads = [], []
 		self.out = None
 
-	def forward(self, x):
+	def forward(self, x: np.ndarray)-> np.ndarray:
 		self.out = softmax(x)
 		return self.out
 
-	def backward(self, dout):
+	def backward(self, dout: np.ndarray)-> np.ndarray:
 		dx = self.out * dout
 		sumdx = np.sum(dx, axis=1, keepdims=True)
 		dx -= self.out * sumdx
@@ -125,7 +146,7 @@ class SoftmaxWithLoss:
 		self.y = None  
 		self.t = None  
 
-	def forward(self, x, t):
+	def forward(self, x: np.ndarray, t: np.ndarray)-> np.float64:
 		self.t = t
 		self.y = softmax(x)
 		if self.t.size == self.y.size:
@@ -133,7 +154,7 @@ class SoftmaxWithLoss:
 		loss = cross_entropy_error(self.y, self.t)
 		return loss
 
-	def backward(self, dout=1):
+	def backward(self, dout: np.float64=1.0)-> np.ndarray:
 		batch_size = self.t.shape[0]
 		dx = self.y.copy()
 		dx[np.arange(batch_size), self.t] -= 1

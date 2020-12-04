@@ -6,20 +6,20 @@ from .config import *
 ##########################################################################################
 
 # 阶跃函数
-def step_function(x):
+def step_function(x:np.ndarray) -> np.ndarray:
 	y = x > 0
 	return y.astype(np.int)
 
 # sigmoid函数
-def sigmoid(x):
+def sigmoid(x:np.ndarray) -> np.ndarray:
 	return 1/(1+np.exp(-x))
 
 # relu函数
-def relu(x):
+def relu(x:np.ndarray) -> np.ndarray:
 	return np.maximum(0, x)
 
 # tanh函数 
-def tanh(x):
+def tanh(x:np.ndarray) -> np.ndarray:
 	return np.tanh(x)
 
 

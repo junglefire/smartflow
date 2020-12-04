@@ -6,12 +6,6 @@ import logging as log
 import numpy as np
 import sys
 
-# from smartflow.dataset import spiral
-# from smartflow.optimizer import *
-# from smartflow.trainer import *
-# from smartflow.config import *
-# from smartflow.layers import *
-
 log.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s', level=log.INFO)
 
 #
@@ -37,7 +31,7 @@ def __custom_train():
 	learning_rate = 1.0
 	# 加载数据
 	x, t = sf.dataset.spiral.load_data()
-	model = TwoLayerNet(input_size=2, hidden_size=hidden_size, output_size=3)
+	model = sf.models.simple_nn.TwoLayerNetEx(input_size=2, hidden_size=hidden_size, output_size=3)
 	optimizer = SGD(lr=learning_rate)
 	# 学習で使用する変数
 	data_size = len(x)
@@ -81,51 +75,11 @@ def __exec_trainer():
 	learning_rate = 1.0
 	# 生成数据集
 	x, t = sf.dataset.spiral.load_data()
-	model = TwoLayerNet(input_size=2, hidden_size=hidden_size, output_size=3)
+	model = sf.models.simple_nn.TwoLayerNetEx(input_size=2, hidden_size=hidden_size, output_size=3)
 	optimizer = sf.base.optimizer.SGD(lr=learning_rate)
 	trainer = sf.base.trainer.Trainer(model, optimizer)
 	trainer.fit(x, t, max_epoch, batch_size, eval_interval=10)
 	trainer.plot()
-
-
-#
-# 定义两层神经网络
-class TwoLayerNet:
-	def __init__(self, input_size, hidden_size, output_size):
-		I, H, O = input_size, hidden_size, output_size
-		# 初始化
-		W1 = 0.01 * np.random.randn(I, H)
-		b1 = np.zeros(H)
-		W2 = 0.01 * np.random.randn(H, O)
-		b2 = np.zeros(O)
-		# 定义NN的层
-		self.layers = [
-			sf.base.layers.Affine(W1, b1),
-			sf.base.layers.Sigmoid(),
-			sf.base.layers.Affine(W2, b2)
-		]
-		self.loss_layer = sf.base.layers.SoftmaxWithLoss()
-		# 存储参数和梯度
-		self.params, self.grads = [], []
-		for layer in self.layers:
-			self.params += layer.params
-			self.grads += layer.grads
-
-	def predict(self, x):
-		for layer in self.layers:
-			x = layer.forward(x)
-		return x
-
-	def forward(self, x, t):
-		score = self.predict(x)
-		loss = self.loss_layer.forward(score, t)
-		return loss
-
-	def backward(self, dout=1):
-		dout = self.loss_layer.backward(dout)
-		for layer in reversed(self.layers):
-			dout = layer.backward(dout)
-		return dout
 
 #
 # 主进程

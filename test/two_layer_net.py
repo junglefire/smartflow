@@ -3,6 +3,7 @@
 import matplotlib.pyplot as plt
 import smartflow as sf
 import logging as log
+import numpy as np
 
 # from smartflow.dataset import mnist
 # from smartflow import simple_nn
@@ -13,7 +14,7 @@ log.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s', level=log.INF
 mnist = sf.dataset.mnist.Mnist("dataset")
 (x_train, t_train), (x_test, t_test) = mnist.load_mnist(one_hot_label=True)
 
-network = simple_nn.TwoLayerNet(input_size=784, hidden_size=100, output_size=10)
+network = sf.models.simple_nn.TwoLayerNet(input_size=784, hidden_size=100, output_size=10)
 
 iters_num = 10000 
 train_size = x_train.shape[0]
