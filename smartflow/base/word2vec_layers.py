@@ -1,10 +1,34 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-from .layers import Embedding, SigmoidWithLoss
+from .layers import SigmoidWithLoss
 from .config import GPU
 from .function import *
 from .np import * 
 import collections
+
+#
+# 词嵌入
+class Embedding:
+	def __init__(self, W):
+		self.params = [W]
+		self.grads = [np.zeros_like(W)]
+		self.idx = None
+
+	def forward(self, idx):
+		W, = self.params
+		self.idx = idx
+		out = W[idx]
+		return out
+
+	def backward(self, dout):
+		dW, = self.grads
+		dW[...] = 0
+		if GPU:
+			np.scatter_add(dW, self.idx, dout)
+		else:
+			# 参考原书Page 136~137
+			np.add.at(dW, self.idx, dout)
+		return None
 
 #
 # 优化中间层到输出层的计算性能

@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 import sys
 sys.path.append('..')
-from ..base.neg_sampling_layer import *
+from ..base.word2vec_layers import *
 from ..base.layers import *
 import numpy as np
 

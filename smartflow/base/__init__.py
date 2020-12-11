@@ -9,5 +9,5 @@ __all__ = [
 	'optimizer',
 	'trainer',
 	'config',
-	'neg_sampling_layer'
+	'word2vec_layers'
 ]

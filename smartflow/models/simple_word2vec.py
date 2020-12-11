@@ -12,9 +12,9 @@ class SimpleCBOW:
 		V, H = vocab_size, hidden_size
 		W_in = 0.01 * np.random.randn(V, H).astype('f')
 		W_out = 0.01 * np.random.randn(H, V).astype('f')
-		self.in_layer0 = MatMul(W_in)
-		self.in_layer1 = MatMul(W_in)
-		self.out_layer = MatMul(W_out)
+		self.in_layer0 = MatMulLayer(W_in)
+		self.in_layer1 = MatMulLayer(W_in)
+		self.out_layer = MatMulLayer(W_out)
 		self.loss_layer = SoftmaxWithLoss()
 		layers = [self.in_layer0, self.in_layer1, self.out_layer]
 		self.params, self.grads = [], []
@@ -46,8 +46,8 @@ class SimpleSkipGram:
         V, H = vocab_size, hidden_size
         W_in = 0.01 * np.random.randn(V, H).astype('f')
         W_out = 0.01 * np.random.randn(H, V).astype('f')
-        self.in_layer = MatMul(W_in)
-        self.out_layer = MatMul(W_out)
+        self.in_layer = MatMulLayer(W_in)
+        self.out_layer = MatMulLayer(W_out)
         self.loss_layer1 = SoftmaxWithLoss()
         self.loss_layer2 = SoftmaxWithLoss()
         layers = [self.in_layer, self.out_layer]
