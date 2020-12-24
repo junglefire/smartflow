@@ -9,5 +9,7 @@ __all__ = [
 	'optimizer',
 	'trainer',
 	'config',
-	'word2vec_layers'
+	'word2vec_layers',
+	'time_layers',
+	'base_model'
 ]

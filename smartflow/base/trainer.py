@@ -61,6 +61,8 @@ class Trainer:
 		plt.show()
 
 
+#
+# RNN语言模型的训练器
 class RnnlmTrainer:
 	def __init__(self, model, optimizer):
 		self.model = model
@@ -73,11 +75,11 @@ class RnnlmTrainer:
 	def get_batch(self, x, t, batch_size, time_size):
 		batch_x = np.empty((batch_size, time_size), dtype='i')
 		batch_t = np.empty((batch_size, time_size), dtype='i')
-
+		# 计算每个批次的起始位置
 		data_size = len(x)
 		jump = data_size // batch_size
-		offsets = [i * jump for i in range(batch_size)]  # バッチの各サンプルの読み込み開始位置
-
+		offsets = [i * jump for i in range(batch_size)]
+		# 按批次存储
 		for time in range(time_size):
 			for i, offset in enumerate(offsets):
 				batch_x[i, time] = x[(offset + self.time_idx) % data_size]
@@ -95,13 +97,11 @@ class RnnlmTrainer:
 		model, optimizer = self.model, self.optimizer
 		total_loss = 0
 		loss_count = 0
-
+		# 开始训练
 		start_time = time.time()
 		for epoch in range(max_epoch):
 			for iters in range(max_iters):
 				batch_x, batch_t = self.get_batch(xs, ts, batch_size, time_size)
-
-				# 勾配を求め、パラメータを更新
 				loss = model.forward(batch_x, batch_t)
 				model.backward()
 				params, grads = remove_duplicate(model.params, model.grads)  # 共有された重みを1つに集約
@@ -110,8 +110,6 @@ class RnnlmTrainer:
 				optimizer.update(params, grads)
 				total_loss += loss
 				loss_count += 1
-
-				# パープレキシティの評価
 				if (eval_interval is not None) and (iters % eval_interval) == 0:
 					ppl = np.exp(total_loss / loss_count)
 					elapsed_time = time.time() - start_time
@@ -119,11 +117,10 @@ class RnnlmTrainer:
 						  % (self.current_epoch + 1, iters + 1, max_iters, elapsed_time, ppl))
 					self.ppl_list.append(float(ppl))
 					total_loss, loss_count = 0, 0
-
 			self.current_epoch += 1
 
 	def plot(self, ylim=None):
-		x = numpy.arange(len(self.ppl_list))
+		x = np.arange(len(self.ppl_list))
 		if ylim is not None:
 			plt.ylim(*ylim)
 		plt.plot(x, self.ppl_list, label='train')

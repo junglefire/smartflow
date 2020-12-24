@@ -5,6 +5,8 @@ from ..base.function import *
 from ..base.layers import *
 from ..base.np import *
 
+# [TODO] 修改文件名，从`simple_nn.py`改成`ffn.py`
+
 # 这里定义的2层神经网络只用于说明NN的基本原理，不能在实际应用中使用
 class TwoLayerNet:
 	def __init__(self, input_size, hidden_size, output_size, weight_init_std=0.01):

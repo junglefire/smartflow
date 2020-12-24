@@ -5,6 +5,8 @@ sys.path.append('..')
 from ..base.layers import *
 import numpy as np
 
+# [TODO]合并`simple_word2vec.py`和`word2vec.py`文件
+
 #
 # 一个简版的CBOW模型，仅用于学习，参考原书3.2节
 class SimpleCBOW:
