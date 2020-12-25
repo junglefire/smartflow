@@ -190,6 +190,8 @@ def eval_perplexity(model, corpus, batch_size=10, time_size=35):
 	return ppl
 
 
+#
+# 评估seq2seq模型性能
 def eval_seq2seq(model, question, correct, id_to_char,
 				 verbos=False, is_reverse=False):
 	correct = correct.flatten()
