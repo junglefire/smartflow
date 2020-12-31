@@ -11,5 +11,6 @@ __all__ = [
 	'config',
 	'word2vec_layers',
 	'time_layers',
-	'base_model'
+	'base_model',
+	'attention_layer'
 ]
